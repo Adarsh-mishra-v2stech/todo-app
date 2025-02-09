@@ -15,7 +15,7 @@ type TodoActionType =
 
 type TodoContextType = {
   todos: TodoItem[];
-  addTodo: (todo: Omit<TodoItem, "id">) => void;
+  addTodo: (todo: TodoItem) => void;
   deleteTodo: (id: string) => void;
   toggleTodo: (id: string) => void;
   updateTodo: (todo: TodoItem) => void;
@@ -32,7 +32,7 @@ const todoReducer = (state: TodoItem[], action: TodoActionType): TodoItem[] => {
     case "TOGGLE_TODO":
       return state.map((todo) =>
         todo.id === action.payload
-          ? { ...todo, completed: todo.completed }
+          ? { ...todo, completed: !todo.completed }
           : todo
       );
     case "UPDATE_TODO":
@@ -47,12 +47,10 @@ const todoReducer = (state: TodoItem[], action: TodoActionType): TodoItem[] => {
 
 export const TodoProvider = ({ children }: { children: ReactNode }) => {
   const [todos, dispatch] = useReducer(todoReducer, []);
-  const generateId = () => Date.now().toString();
 
   const value: TodoContextType = {
     todos,
-    addTodo: (todo) =>
-      dispatch({ type: "ADD_TODO", payload: { ...todo, id: generateId() } }),
+    addTodo: (todo) => dispatch({ type: "ADD_TODO", payload: { ...todo } }),
     deleteTodo: (id) => dispatch({ type: "DELETE_TODO", payload: id }),
     toggleTodo: (id) => dispatch({ type: "TOGGLE_TODO", payload: id }),
     updateTodo: (todo) => dispatch({ type: "UPDATE_TODO", payload: todo }),

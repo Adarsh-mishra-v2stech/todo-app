@@ -1,16 +1,14 @@
-import React from "react";
-import logo from "./logo.svg";
-import "./App.css";
 import { TodoProvider } from "./Context/useTodoContext";
 import TodoForm from "./Components/TodoForm";
+import { Typography } from "@mui/material";
 
 function App() {
   return (
     <TodoProvider>
-      <div className="App">
-        <p>My Todo App</p>
-        <TodoForm />
-      </div>
+      <Typography sx={{ mt: 4 }} variant="h4" align="center">
+        Todo App
+      </Typography>
+      <TodoForm />
     </TodoProvider>
   );
 }
