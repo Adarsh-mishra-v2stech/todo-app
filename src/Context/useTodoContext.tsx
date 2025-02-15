@@ -5,55 +5,28 @@ import {
   ReactNode,
   useState,
 } from "react";
-import { TodoItem } from "./type";
-
-type TodoActionType =
-  | { type: "ADD_TODO"; payload: TodoItem }
-  | { type: "DELETE_TODO"; payload: string }
-  | { type: "TOGGLE_TODO"; payload: string }
-  | { type: "UPDATE_TODO"; payload: TodoItem };
-
-type TodoContextType = {
-  todos: TodoItem[];
-  addTodo: (todo: TodoItem) => void;
-  deleteTodo: (id: string) => void;
-  toggleTodo: (id: string) => void;
-  updateTodo: (todo: TodoItem) => void;
-};
+import { TodoContextType, TodoItem } from "./type";
+import todoReducer, {
+  addTodoAction,
+  deleteTodoAction,
+  toggleTodoAction,
+  updateTodoAction,
+} from "./todoReducer";
 
 const TodoContext = createContext<TodoContextType | undefined>(undefined);
 
-const todoReducer = (state: TodoItem[], action: TodoActionType): TodoItem[] => {
-  switch (action.type) {
-    case "ADD_TODO":
-      return [...state, action.payload];
-    case "DELETE_TODO":
-      return state.filter((todo) => todo.id !== action.payload);
-    case "TOGGLE_TODO":
-      return state.map((todo) =>
-        todo.id === action.payload
-          ? { ...todo, completed: !todo.completed }
-          : todo
-      );
-    case "UPDATE_TODO":
-      return state.map((todo) =>
-        todo.id === action.payload.id ? action.payload : todo
-      );
-
-    default:
-      return state;
-  }
-};
-
 export const TodoProvider = ({ children }: { children: ReactNode }) => {
   const [todos, dispatch] = useReducer(todoReducer, []);
+  const [editTodo, setEditTodo] = useState<TodoItem | null>(null);
 
   const value: TodoContextType = {
     todos,
-    addTodo: (todo) => dispatch({ type: "ADD_TODO", payload: { ...todo } }),
-    deleteTodo: (id) => dispatch({ type: "DELETE_TODO", payload: id }),
-    toggleTodo: (id) => dispatch({ type: "TOGGLE_TODO", payload: id }),
-    updateTodo: (todo) => dispatch({ type: "UPDATE_TODO", payload: todo }),
+    addTodo: (todo) => dispatch(addTodoAction(todo)),
+    deleteTodo: (id) => dispatch(deleteTodoAction(id)),
+    toggleTodo: (id) => dispatch(toggleTodoAction(id)),
+    updateTodo: (todo) => dispatch(updateTodoAction(todo)),
+    setEditTodo,
+    editTodo,
   };
   return <TodoContext.Provider value={value}>{children}</TodoContext.Provider>;
 };

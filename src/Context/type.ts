@@ -1,3 +1,5 @@
+import { TODO_ACTIONS_TYPE } from "./constant";
+
 export enum Priority {
   High = "High",
   Medium = "Medium",
@@ -12,3 +14,19 @@ export interface TodoItem {
   priority: Priority;
   dueDate: string;
 }
+
+export type TodoActionType =
+  | { type: typeof TODO_ACTIONS_TYPE.ADD_TODO; payload: TodoItem }
+  | { type: typeof TODO_ACTIONS_TYPE.DELETE_TODO; payload: string }
+  | { type: typeof TODO_ACTIONS_TYPE.TOGGLE_TODO; payload: string }
+  | { type: typeof TODO_ACTIONS_TYPE.UPDATE_TODO; payload: TodoItem };
+
+export type TodoContextType = {
+  todos: TodoItem[];
+  addTodo: (todo: TodoItem) => void;
+  deleteTodo: (id: string) => void;
+  toggleTodo: (id: string) => void;
+  updateTodo: (todo: TodoItem) => void;
+  setEditTodo: (todo: TodoItem | null) => void;
+  editTodo: TodoItem | null;
+};

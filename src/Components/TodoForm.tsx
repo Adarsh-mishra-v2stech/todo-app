@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTodos } from "../Context/useTodoContext";
 import {
   Grid,
@@ -15,18 +15,18 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import TodoList from "./TodoLIst";
-import { Priority } from "../Context/type";
+import { Priority, TodoItem } from "../Context/type";
+import { isTodoDisabled } from "./utils";
 
+const generateId = () => Date.now().toString();
 const TodoForm = () => {
-  const { addTodo, todos } = useTodos();
-  const generateId = () => Date.now().toString();
-  const [todosData, setTodosData] = useState({
+  const { addTodo, todos, editTodo, updateTodo, setEditTodo } = useTodos();
+  const [todosData, setTodosData] = useState<TodoItem>({
     id: "",
     title: "",
     description: "",
     completed: false,
-    dueDate: "", // Changed to null for DatePicker compatibility
+    dueDate: "",
     priority: Priority.Medium,
   });
 
@@ -45,10 +45,25 @@ const TodoForm = () => {
       priority: e.target.value,
     });
   };
-  console.log(todos);
+
+  useEffect(() => {
+    if (editTodo) {
+      setTodosData(editTodo);
+    }
+  }, [editTodo]);
   const handleAddTodo = () => {
-    addTodo({ ...todosData, id: generateId() });
-    alert("Todo added successfully");
+    if (editTodo) {
+      updateTodo({ ...todosData, id: editTodo.id });
+      setEditTodo(null);
+      alert("Todo updated successfully");
+    } else {
+      addTodo({ ...todosData, id: generateId() });
+      alert("Todo added successfully");
+    }
+    resetForm();
+  };
+
+  const resetForm = () => {
     setTodosData({
       id: "",
       title: "",
@@ -57,6 +72,11 @@ const TodoForm = () => {
       dueDate: "",
       priority: Priority.Medium,
     });
+  };
+
+  const handleEditCancel = () => {
+    setEditTodo(null);
+    resetForm();
   };
 
   return (
@@ -96,6 +116,7 @@ const TodoForm = () => {
               slotProps={{ textField: { size: "small", required: true } }}
               name="dueDate"
               value={todosData.dueDate ? dayjs(todosData.dueDate) : null}
+              minDate={dayjs()}
               onChange={(newValue) => {
                 setTodosData({
                   ...todosData,
@@ -116,33 +137,32 @@ const TodoForm = () => {
               onChange={handlePriorityChange}
               required={true}
             >
-              <MenuItem value={Priority.Low}>Low</MenuItem>
-              <MenuItem value={Priority.Medium}>Medium</MenuItem>
-              <MenuItem value={Priority.High}>High</MenuItem>
+              <MenuItem value={Priority.Low}>{Priority.Low}</MenuItem>
+              <MenuItem value={Priority.Medium}>{Priority.Medium}</MenuItem>
+              <MenuItem value={Priority.High}>{Priority.High}</MenuItem>
             </Select>
           </FormControl>
-          <Button
-            variant="contained"
-            disabled={
-              !todosData.title ||
-              !todosData.description ||
-              !todosData.dueDate ||
-              !todosData.priority
-            }
-            onClick={handleAddTodo}
-          >
-            Add Todo
-          </Button>
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Button
+              variant="contained"
+              disabled={isTodoDisabled(todosData)}
+              onClick={handleAddTodo}
+            >
+              {editTodo ? "Update Todo" : "Add Todo"}
+            </Button>
+            {editTodo && (
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  handleEditCancel();
+                }}
+              >
+                Cancel
+              </Button>
+            )}
+          </Box>
         </Box>
       </Box>
-      {/* todo-list */}
-      {todos.length > 0 && (
-        <Typography sx={{ textAlign: "center", mt: 6 }} variant="h5">
-          My Todos
-        </Typography>
-      )}
-
-      <TodoList />
     </Box>
   );
 };
