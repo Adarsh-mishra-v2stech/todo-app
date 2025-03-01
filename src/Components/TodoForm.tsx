@@ -17,6 +17,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { Priority, TodoItem } from "../Context/type";
 import { isTodoDisabled } from "./utils";
+import SnackbarComponent from "./SnackbarComponent";
+import useSnackbar from "../hook/useSnackbar";
 
 const generateId = () => Date.now().toString();
 const TodoForm = () => {
@@ -29,6 +31,7 @@ const TodoForm = () => {
     dueDate: "",
     priority: Priority.Medium,
   });
+  const { snackbarState, openSnackbar, closeSnackbar } = useSnackbar();
 
   const handleTodosChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -55,10 +58,10 @@ const TodoForm = () => {
     if (editTodo) {
       updateTodo({ ...todosData, id: editTodo.id });
       setEditTodo(null);
-      alert("Todo updated successfully");
+      openSnackbar("Todo updated successfully", "success");
     } else {
       addTodo({ ...todosData, id: generateId() });
-      alert("Todo added successfully");
+      openSnackbar("Todo added successfully", "success");
     }
     resetForm();
   };
@@ -163,6 +166,12 @@ const TodoForm = () => {
           </Box>
         </Box>
       </Box>
+      <SnackbarComponent
+        open={snackbarState.open}
+        message={snackbarState.message}
+        severity={snackbarState.severity}
+        onClose={closeSnackbar}
+      />
     </Box>
   );
 };

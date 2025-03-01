@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 
 const TodoItems = ({ todo }: { todo: TodoItem }) => {
-  const { toggleTodo, deleteTodo, setEditTodo } = useTodos();
+  const { toggleTodo, deleteTodo, setEditTodo, duplicateTodo } = useTodos();
 
   return (
     <Box
@@ -23,8 +23,9 @@ const TodoItems = ({ todo }: { todo: TodoItem }) => {
           justifyContent: "center",
           alignItems: "center",
           width: "100%",
-          mx: 10,
+          mx: 4,
           padding: 2,
+          mt: 2,
           backgroundColor: "#f9f9f9",
         }}
       >
@@ -78,6 +79,13 @@ const TodoItems = ({ todo }: { todo: TodoItem }) => {
             onClick={() => setEditTodo(todo)}
           >
             Edit
+          </Button>
+          <Button
+            variant="contained"
+            color="inherit"
+            onClick={() => duplicateTodo(todo)}
+          >
+            Duplicate
           </Button>
         </CardActions>
       </Card>

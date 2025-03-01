@@ -1,6 +1,7 @@
 import { TodoItem, TodoActionType } from "./type";
 import { TODO_ACTIONS_TYPE } from "./constant";
 
+// Reducer Function
 const todoReducer = (state: TodoItem[], action: TodoActionType): TodoItem[] => {
   switch (action.type) {
     case TODO_ACTIONS_TYPE.ADD_TODO:
@@ -17,6 +18,20 @@ const todoReducer = (state: TodoItem[], action: TodoActionType): TodoItem[] => {
       return state.map((todo: TodoItem) =>
         todo.id === action.payload.id ? action.payload : todo
       );
+    case TODO_ACTIONS_TYPE.DUPLICATE_TODO:
+      const original = state.find((todo) => todo.id === action.payload.id);
+      if (!original) return state;
+
+      return [
+        {
+          ...original,
+          id: Date.now().toString(),
+          title: `${original.title}_copy`,
+          dueDate: new Date().toISOString().split("T")[0],
+        },
+        ...state,
+      ];
+
     default:
       return state;
   }
@@ -47,6 +62,13 @@ export const toggleTodoAction = (id: string) => {
 export const updateTodoAction = (todo: TodoItem) => {
   return {
     type: TODO_ACTIONS_TYPE.UPDATE_TODO,
+    payload: todo,
+  } as const;
+};
+
+export const duplicateTodoAction = (todo: TodoItem) => {
+  return {
+    type: TODO_ACTIONS_TYPE.DUPLICATE_TODO,
     payload: todo,
   } as const;
 };
