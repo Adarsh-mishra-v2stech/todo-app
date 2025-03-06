@@ -18,12 +18,14 @@ import todoReducer, {
 import { sortFilterTodo } from "./utils";
 import { PRIORITY_ORDER } from "./constant";
 import { getInitialTodos, setTodosLocal } from "./utils";
+import { STATIC_TODOS } from "./constant";
 
 const TodoContext = createContext<TodoContextType | undefined>(undefined);
 
 export const TodoProvider = ({ children }: { children: ReactNode }) => {
   // get initial todos from local storage
   const initialState = getInitialTodos();
+
   const [todos, dispatch] = useReducer(todoReducer, initialState);
   const [editTodo, setEditTodo] = useState<TodoItem | null>(null);
   const [sortByTitle, setSortByTitle] = useState<string>("");
