@@ -33,6 +33,7 @@ const DateRangeFilter = () => {
     completedStatus,
     setCompletedStatus,
   } = useTodos();
+  const [isMenuOpen, setMenuOpen] = useState(false);
 
   const handleSortByTitle = () => {
     setSortByPriority("");
@@ -49,21 +50,37 @@ const DateRangeFilter = () => {
       <h3>Filter & Sort</h3>
       <Grid container spacing={2}>
         <Grid>
-          <Autocomplete
+          {/* <Autocomplete
             sx={{ width: 250 }}
             size="small"
             options={todos}
             disablePortal
             id="combo-box-demo"
+            open={isMenuOpen}
+            openOnFocus={false}
             renderInput={(params) => (
               <TextField
                 label="Search by Title"
                 {...params}
-                onChange={(e) => setSearchTitle(e.target.value)}
+                onChange={(e) => {
+                  setSearchTitle(e.target.value);
+                  setMenuOpen(e.target.value.length > 0);
+                }}
               />
             )}
             getOptionLabel={(option) => option.title}
-            onChange={(e, value) => setSearchTitle(value?.title || "")}
+            onChange={(e, value) => {
+              setSearchTitle(value?.title || "");
+              setMenuOpen(false);
+            }}
+          /> */}
+
+          <TextField
+            label="Search by Title"
+            size="small"
+            sx={{ width: 250 }}
+            value={searchTitle}
+            onChange={(e) => setSearchTitle(e.target.value)}
           />
         </Grid>
         <Grid>
@@ -91,7 +108,7 @@ const DateRangeFilter = () => {
               onChange={(newValue) =>
                 setDateRange({
                   ...dateRange,
-                  start: newValue ? newValue.toISOString() : "",
+                  start: newValue ? newValue.format("YYYY-MM-DD") : "",
                 })
               }
               slotProps={{ textField: { size: "small", required: true } }}
@@ -106,7 +123,7 @@ const DateRangeFilter = () => {
               onChange={(newValue) =>
                 setDateRange({
                   ...dateRange,
-                  end: newValue ? newValue.toISOString() : "",
+                  end: newValue ? newValue.format("YYYY-MM-DD") : "",
                 })
               }
               slotProps={{ textField: { size: "small", required: true } }}

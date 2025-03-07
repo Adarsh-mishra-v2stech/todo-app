@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useTodos } from "../Context/useTodoContext";
 import {
   Grid,
@@ -9,73 +9,45 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  Typography,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import { Priority, TodoItem } from "../Context/type";
+import { Priority } from "../Context/type";
 import { isTodoDisabled } from "./utils";
 import SnackbarComponent from "./SnackbarComponent";
 import useSnackbar from "../hook/useSnackbar";
+import { useTodoForm } from "../hook/useTodoForm";
 
-const generateId = () => Date.now().toString();
 const TodoForm = () => {
-  const { addTodo, todos, editTodo, updateTodo, setEditTodo } = useTodos();
-  const [todosData, setTodosData] = useState<TodoItem>({
-    id: "",
-    title: "",
-    description: "",
-    completed: false,
-    dueDate: "",
-    priority: Priority.Medium,
-  });
+  const { editTodo, setEditTodo } = useTodos();
   const { snackbarState, openSnackbar, closeSnackbar } = useSnackbar();
-
-  const handleTodosChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setTodosData({
-      ...todosData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handlePriorityChange = (e: any) => {
-    setTodosData({
-      ...todosData,
-      priority: e.target.value,
-    });
-  };
+  const {
+    formik: {
+      handleChange,
+      handleSubmit,
+      values,
+      setFieldValue,
+      errors,
+      resetForm,
+      touched,
+      setFieldTouched,
+    },
+  } = useTodoForm({
+    openSnackbar,
+    setEditTodo,
+    editTodo,
+  });
 
   useEffect(() => {
     if (editTodo) {
-      setTodosData(editTodo);
+      setFieldValue("title", editTodo.title);
+      setFieldValue("description", editTodo.description);
+      setFieldValue("dueDate", editTodo.dueDate);
+      setFieldValue("priority", editTodo.priority);
     }
-  }, [editTodo]);
-  const handleAddTodo = () => {
-    if (editTodo) {
-      updateTodo({ ...todosData, id: editTodo.id });
-      setEditTodo(null);
-      openSnackbar("Todo updated successfully", "success");
-    } else {
-      addTodo({ ...todosData, id: generateId() });
-      openSnackbar("Todo added successfully", "success");
-    }
-    resetForm();
-  };
-
-  const resetForm = () => {
-    setTodosData({
-      id: "",
-      title: "",
-      description: "",
-      completed: false,
-      dueDate: "",
-      priority: Priority.Medium,
-    });
-  };
+  }, [editTodo, setFieldValue]);
 
   const handleEditCancel = () => {
     setEditTodo(null);
@@ -96,37 +68,53 @@ const TodoForm = () => {
           autoComplete="off"
         >
           <TextField
-            required
             label="Title"
             size="small"
             name="title"
-            value={todosData.title}
-            onChange={handleTodosChange}
+            value={values.title}
+            onChange={(e) => {
+              setFieldTouched("title", true);
+              handleChange(e);
+            }}
+            onBlur={() => setFieldTouched("title")}
+            error={Boolean(touched.title && errors.title)}
+            helperText={touched.title && errors.title}
           />
           <TextField
-            required
             label="Description"
             size="small"
             name="description"
             multiline
-            value={todosData.description}
-            onChange={handleTodosChange}
+            value={values.description}
+            onChange={(e) => {
+              setFieldTouched("description", true);
+              handleChange(e);
+            }}
+            onBlur={() => setFieldTouched("description")}
+            error={Boolean(touched.description && errors.description)}
+            helperText={touched.description && errors.description}
           />
 
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
               label="Due Date"
-              slotProps={{ textField: { size: "small", required: true } }}
+              slotProps={{
+                textField: {
+                  size: "small",
+                  required: true,
+                  error: Boolean(touched.dueDate && errors.dueDate),
+                  helperText: touched.dueDate && errors.dueDate,
+                  onBlur: () => setFieldTouched("dueDate"),
+                },
+              }}
               name="dueDate"
-              value={todosData.dueDate ? dayjs(todosData.dueDate) : null}
+              value={values.dueDate ? dayjs(values.dueDate) : null}
               minDate={dayjs()}
               onChange={(newValue) => {
-                setTodosData({
-                  ...todosData,
-                  dueDate: newValue
-                    ? newValue.format("YYYY-MM-DD").toString()
-                    : "",
-                });
+                setFieldValue(
+                  "dueDate",
+                  newValue ? newValue.format("YYYY-MM-DD").toString() : ""
+                );
               }}
             />
           </LocalizationProvider>
@@ -136,8 +124,8 @@ const TodoForm = () => {
             <Select
               name="priority"
               label="Priority"
-              value={todosData.priority}
-              onChange={handlePriorityChange}
+              value={values.priority}
+              onChange={handleChange}
               required={true}
             >
               <MenuItem value={Priority.Low}>{Priority.Low}</MenuItem>
@@ -148,18 +136,14 @@ const TodoForm = () => {
           <Box sx={{ display: "flex", gap: 1 }}>
             <Button
               variant="contained"
-              disabled={isTodoDisabled(todosData)}
-              onClick={handleAddTodo}
+              onClick={() => {
+                handleSubmit();
+              }}
             >
               {editTodo ? "Update Todo" : "Add Todo"}
             </Button>
             {editTodo && (
-              <Button
-                variant="outlined"
-                onClick={() => {
-                  handleEditCancel();
-                }}
-              >
+              <Button variant="outlined" onClick={handleEditCancel}>
                 Cancel
               </Button>
             )}

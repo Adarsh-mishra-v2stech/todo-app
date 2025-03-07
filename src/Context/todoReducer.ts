@@ -5,6 +5,7 @@ import { TODO_ACTIONS_TYPE } from "./constant";
 const todoReducer = (state: TodoItem[], action: TodoActionType): TodoItem[] => {
   switch (action.type) {
     case TODO_ACTIONS_TYPE.ADD_TODO:
+      console.log(" action.payload", action.payload);
       return [...state, action.payload];
     case TODO_ACTIONS_TYPE.DELETE_TODO:
       return state.filter((todo) => todo.id !== action.payload);

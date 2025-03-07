@@ -7,12 +7,11 @@ const filterByDateRange = (
   dateRange: DateRange
 ): TodoItem[] => {
   return todos.filter((todo) => {
-    const todoDate = new Date(todo.dueDate).getTime();
-    const startDateValid =
-      !dateRange.start || todoDate >= new Date(dateRange.start).getTime();
-    const endDateValid =
-      !dateRange.end || todoDate <= new Date(dateRange.end).getTime();
-    return startDateValid && endDateValid;
+    const dueDate = new Date(todo.dueDate);
+    return (
+      (!dateRange.start || dueDate >= new Date(dateRange.start)) &&
+      (!dateRange.end || dueDate <= new Date(dateRange.end))
+    );
   });
 };
 
