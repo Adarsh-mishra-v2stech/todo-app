@@ -13,6 +13,14 @@ import {
 const TodoItems = ({ todo }: { todo: TodoItem }) => {
   const { toggleTodo, deleteTodo, setEditTodo, duplicateTodo } = useTodos();
 
+  const handleEdit = () => {
+    setEditTodo(todo);
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
   return (
     <Box
       sx={{ my: 2, width: "100%", display: "flex", justifyContent: "center" }}
@@ -76,7 +84,7 @@ const TodoItems = ({ todo }: { todo: TodoItem }) => {
           <Button
             variant="contained"
             color="warning"
-            onClick={() => setEditTodo(todo)}
+            onClick={() => handleEdit()}
           >
             Edit
           </Button>

@@ -33,7 +33,6 @@ const DateRangeFilter = () => {
     completedStatus,
     setCompletedStatus,
   } = useTodos();
-  const [isMenuOpen, setMenuOpen] = useState(false);
 
   const handleSortByTitle = () => {
     setSortByPriority("");
@@ -50,31 +49,6 @@ const DateRangeFilter = () => {
       <h3>Filter & Sort</h3>
       <Grid container spacing={2}>
         <Grid>
-          {/* <Autocomplete
-            sx={{ width: 250 }}
-            size="small"
-            options={todos}
-            disablePortal
-            id="combo-box-demo"
-            open={isMenuOpen}
-            openOnFocus={false}
-            renderInput={(params) => (
-              <TextField
-                label="Search by Title"
-                {...params}
-                onChange={(e) => {
-                  setSearchTitle(e.target.value);
-                  setMenuOpen(e.target.value.length > 0);
-                }}
-              />
-            )}
-            getOptionLabel={(option) => option.title}
-            onChange={(e, value) => {
-              setSearchTitle(value?.title || "");
-              setMenuOpen(false);
-            }}
-          /> */}
-
           <TextField
             label="Search by Title"
             size="small"

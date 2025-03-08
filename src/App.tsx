@@ -6,11 +6,15 @@ import DateRangeFilter from "./Components/Filters";
 import { useRef } from "react";
 
 function App() {
+  const formRef = useRef<HTMLDivElement>(null);
+
   return (
     <TodoProvider>
       <Typography sx={{ mt: 4 }} variant="h4" align="center">
         Todo App
       </Typography>
+
+      {/* Pass the ref to TodoForm */}
       <TodoForm />
 
       <Typography sx={{ textAlign: "center", mt: 6 }} variant="h5">
